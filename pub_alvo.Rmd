@@ -1,0 +1,64 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(readxl)
+library(data.table)
+library(purrr)
+
+```
+
+```{r}
+
+dados_pib_munic = read_excel('C:/dados/dissertacao/pib_municipios_2002_2017.xlsx')
+
+```
+
+
+```{r}
+tab_pib_munic = dados_pib_munic
+
+colnames(tab_pib_munic)[7] <- 'cod'
+colnames(tab_pib_munic)[39] <- 'pib'
+colnames(tab_pib_munic)[40] <- 'pib_pc'
+
+tab_pib_munic = tab_pib_munic %>%
+                  select(Ano, cod, pib, pib_pc) %>%
+                  group_by(cod) %>%
+                  mutate(lag_pib = lag(pib),
+                         lag_pib_pc = lag(pib_pc),
+                         var_pib = (pib - lag_pib)/lag_pib, 
+                         var_pib_pc = (pib_pc - lag_pib_pc)/lag_pib_pc,
+                         
+                         lag5_pib = lag(pib, n = 5),
+                         lag5_pib_pc = lag(pib_pc, n = 5),
+                         var5_pib = (pib - lag5_pib)/lag5_pib, 
+                         var5_pib_pc = (pib_pc - lag5_pib_pc)/lag5_pib_pc,
+                         
+                         lag10_pib = lag(pib, n = 10),
+                         lag10_pib_pc = lag(pib_pc, n = 10),
+                         var10_pib = (pib - lag10_pib)/lag10_pib, 
+                         var10_pib_pc = (pib_pc - lag10_pib_pc)/lag10_pib_pc,
+                         
+                         lag15_pib = lag(pib, n = 15),
+                         lag15_pib_pc = lag(pib_pc, n = 15),
+                         var15_pib = (pib - lag15_pib)/lag15_pib, 
+                         var15_pib_pc = (pib_pc - lag15_pib_pc)/lag15_pib_pc,
+                         )
+
+filtro_01 = filter(tab_pib_munic, Ano == 2017)
+
+plot(filtro_01$var_pib_pc)
+plot(filtro_01$var5_pib_pc)
+plot(filtro_01$var15_pib_pc)
+
+```
+
+
